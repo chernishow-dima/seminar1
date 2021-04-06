@@ -18,7 +18,12 @@ function getHistory() {
 }
 
 function updateOutput(newValue) {
-    document.getElementById("output-value").innerText = newValue;
+    if (newValue == "") {
+        document.getElementById("output-value").innerText = newValue;
+    }
+    else {
+        document.getElementById("output-value").innerText = getFormattedNumber(newValue);
+    }
 }
 
 function getOutput() {
@@ -33,28 +38,28 @@ function clearWorker() {
 function backspaceWorker() {
     var output = reverseNumberFormat(document.getElementById("output-value").innerText).toString();
     if (output) {
-        output = output.substr(0, output.length - 1);
-        if (output == "") {
-            updateOutput(output);
-        }
-        else {
-            updateOutput(getFormattedNumber(output));
-        }
+        output = removeLastSymbol(output);
+        updateOutput(output);
     }
 }
 
 function removeLastNaN(string) {
     var result = string;
     if (isNaN(result[result.length - 1])) {
-        result = result.substr(0, result.length - 1);
+        result = removeLastSymbol(result);
     }
     return result;
+}
+
+function removeLastSymbol(str) {
+    var tmpStr = str.slice();
+    return tmpStr.substr(0, tmpStr.length - 1);
 }
 
 function operatorWorker(el) {
     var output = getOutput();
     var history = getHistory();
-    if (output == "" && history != "") { // Если пустой вывод и нечего считать
+    if (output == "" && history != "") {
         history = removeLastNaN(history);
     }
     if (output != "" || history != "") {
@@ -62,12 +67,7 @@ function operatorWorker(el) {
         history += output;
         if (el.id == "=") {
             var result = eval(history);
-            if (result == "") {
-                updateOutput(result);
-            }
-            else {
-                updateOutput(getFormattedNumber(result));
-            }
+            updateOutput(result);
             updateHistory("");
         }
         else {
@@ -82,12 +82,7 @@ function numberClickWorker(el) {
     var output = reverseNumberFormat(getOutput());
     if (output != NaN) {
         output += el.id;
-        if (output == "") {
-            updateOutput(output);
-        }
-        else {
-            updateOutput(getFormattedNumber(output));
-        }
+        updateOutput(output);
     }
 }
 
